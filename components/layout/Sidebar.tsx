@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { ChevronDown, Sparkles, Activity } from "lucide-react";
 import { primaryNav } from "@/data/navigation";
@@ -23,18 +24,21 @@ export function Sidebar() {
 
   return (
     <aside className="hidden lg:flex w-[260px] shrink-0 sticky top-0 h-screen flex-col px-4 py-5 border-r border-border-soft bg-bg-base/60 backdrop-blur-md">
-      <Link href="/" className="flex items-center gap-3 px-2 mb-8 ring-focus rounded-lg">
-        <div className="relative w-9 h-9 rounded-xl bg-brand-gradient flex items-center justify-center shadow-glow">
-          <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-            <path d="M5 4c2 4 5 4 7 8s2 8 7 8" />
-            <path d="M5 4c0 4 3 6 5 8" opacity=".5" />
-            <circle cx="5" cy="4" r="1.6" fill="currentColor" />
-            <circle cx="19" cy="20" r="1.6" fill="currentColor" />
-          </svg>
-        </div>
-        <div className="leading-tight">
-          <div className="text-sm font-semibold tracking-tight">MAVs Cerebrais</div>
-          <div className="text-[11px] text-ink-secondary">Sessão LANC</div>
+      <Link
+        href="/"
+        className="flex flex-col items-start gap-2 px-1 mb-7 ring-focus rounded-lg"
+        aria-label="LANC — Liga Acadêmica de Neurocirurgia da Bahia"
+      >
+        <Image
+          src="/lanc-logo.png"
+          alt="Liga Acadêmica de Neurocirurgia da Bahia"
+          width={956}
+          height={661}
+          priority
+          className="h-auto w-[180px] -ml-1 select-none pointer-events-none"
+        />
+        <div className="px-1.5 py-1 rounded-md bg-brand-400/10 border border-brand-400/25 text-[10.5px] uppercase tracking-widest text-brand-400 font-semibold">
+          Sessão · MAVs Cerebrais
         </div>
       </Link>
 

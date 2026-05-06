@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { ChevronDown, X } from "lucide-react";
 import { primaryNav } from "@/data/navigation";
@@ -36,28 +37,29 @@ export function MobileNav({ open, onClose }: { open: boolean; onClose: () => voi
           paddingBottom: "calc(env(safe-area-inset-bottom) + 1rem)",
         }}
       >
-        <div className="flex items-center justify-between mb-5">
+        <div className="flex items-start justify-between mb-5 gap-3">
           <Link
             href="/"
             onClick={onClose}
-            className="flex items-center gap-3 ring-focus rounded-lg"
+            className="flex flex-col items-start gap-1.5 ring-focus rounded-lg min-w-0"
+            aria-label="LANC — Liga Acadêmica de Neurocirurgia da Bahia"
           >
-            <div className="w-9 h-9 rounded-xl bg-brand-gradient flex items-center justify-center shadow-glow">
-              <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                <path d="M5 4c2 4 5 4 7 8s2 8 7 8" />
-                <circle cx="5" cy="4" r="1.6" fill="currentColor" />
-                <circle cx="19" cy="20" r="1.6" fill="currentColor" />
-              </svg>
-            </div>
-            <div className="leading-tight">
-              <div className="text-[13px] font-semibold tracking-tight">MAVs LANC</div>
-              <div className="text-[10.5px] text-ink-secondary">Sessão acadêmica</div>
-            </div>
+            <Image
+              src="/lanc-logo.png"
+              alt="Liga Acadêmica de Neurocirurgia da Bahia"
+              width={956}
+              height={661}
+              priority
+              className="h-auto w-[150px] -ml-1 select-none pointer-events-none"
+            />
+            <span className="px-1.5 py-0.5 rounded-md bg-brand-400/10 border border-brand-400/25 text-[10px] uppercase tracking-widest text-brand-400 font-semibold">
+              Sessão · MAVs Cerebrais
+            </span>
           </Link>
           <button
             onClick={onClose}
             aria-label="Fechar menu"
-            className="h-10 w-10 inline-flex items-center justify-center text-ink-secondary hover:text-ink-primary rounded-lg hover:bg-white/5"
+            className="h-10 w-10 shrink-0 inline-flex items-center justify-center text-ink-secondary hover:text-ink-primary rounded-lg hover:bg-white/5"
           >
             <X className="w-4 h-4" />
           </button>

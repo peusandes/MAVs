@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import {
   BookCheck,
   GraduationCap,
@@ -23,6 +24,14 @@ export default function AboutPage() {
   return (
     <div className="space-y-8 max-w-[920px] mx-auto">
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+        <Image
+          src="/lanc-logo.png"
+          alt="Liga Acadêmica de Neurocirurgia da Bahia"
+          width={956}
+          height={661}
+          priority
+          className="h-auto w-[200px] sm:w-[240px] -ml-1 mb-4 select-none pointer-events-none"
+        />
         <Badge tone="blue" className="mb-2">
           <Sparkles className="w-3 h-3" /> Sobre o projeto
         </Badge>

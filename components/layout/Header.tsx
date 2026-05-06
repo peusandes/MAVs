@@ -3,6 +3,7 @@
 import * as React from "react";
 import { Search, Bell, Settings, Menu } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { primaryNav } from "@/data/navigation";
 import { modules } from "@/data/modules";
@@ -36,12 +37,27 @@ export function Header({ onMenu }: { onMenu?: () => void }) {
           <Menu className="w-5 h-5" />
         </button>
 
+        <Link
+          href="/"
+          className="lg:hidden flex items-center shrink-0 ring-focus rounded-md"
+          aria-label="LANC — Liga Acadêmica de Neurocirurgia da Bahia"
+        >
+          <Image
+            src="/lanc-logo.png"
+            alt="LANC"
+            width={956}
+            height={661}
+            priority
+            className="h-9 w-auto select-none pointer-events-none"
+          />
+        </Link>
+
         <div className="flex flex-col leading-tight min-w-0">
           <span className="text-[10.5px] sm:text-[11px] text-ink-secondary tracking-wide truncate">
-            <span className="hidden sm:inline">Liga de Neurocirurgia da Bahia</span>
-            <span className="sm:hidden">LANC</span>
+            <span className="hidden lg:inline">Liga de Neurocirurgia da Bahia</span>
+            <span className="lg:hidden">Sessão · MAVs</span>
           </span>
-          <span className="text-[14px] sm:text-[15px] font-semibold text-ink-primary -mt-0.5 truncate max-w-[55vw] sm:max-w-none">
+          <span className="text-[14px] sm:text-[15px] font-semibold text-ink-primary -mt-0.5 truncate max-w-[42vw] sm:max-w-none">
             {pathLabel(pathname)}
           </span>
         </div>

@@ -12,6 +12,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 import { StatCard } from "@/components/dashboard/StatCard";
 import { PerformanceChart } from "@/components/dashboard/PerformanceChart";
@@ -124,14 +125,23 @@ export default function DashboardPage() {
 
         <div className="relative flex flex-col xl:flex-row xl:items-end gap-6 xl:gap-10">
           <div className="flex-1 min-w-0">
+            <Image
+              src="/lanc-logo.png"
+              alt="Liga Acadêmica de Neurocirurgia da Bahia"
+              width={956}
+              height={661}
+              priority
+              className="h-auto w-[180px] sm:w-[230px] -ml-1 mb-4 select-none pointer-events-none"
+            />
+
             <Badge tone="blue" className="mb-3">
               <Sparkles className="w-3 h-3" />
-              Sessão LANC · Liga de Neurocirurgia da Bahia
+              Sessão acadêmica
             </Badge>
 
             <h1 className="text-[30px] sm:text-[42px] font-semibold tracking-tight leading-[1.05] text-balance">
               MAVs Cerebrais
-              <span className="block text-ink-secondary font-medium text-[20px] sm:text-[24px] mt-1">
+              <span className="block text-ink-secondary font-medium text-[18px] sm:text-[24px] mt-1">
                 Material didático · {modules.length} módulos · {totalQuestions} questões
               </span>
             </h1>
