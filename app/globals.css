@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-base: #0a0a0f;
+  --bg-raised: #13131c;
+  --border-soft: rgba(255, 255, 255, 0.06);
+  --brand-400: #5b9dff;
+  --brand-500: #3b7ddd;
+  --brand-800: #1e3a8a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  background: var(--bg-base);
+  color: #f4f4f5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background-image:
+    radial-gradient(1100px circle at 8% -10%, rgba(59, 125, 221, 0.18), transparent 55%),
+    radial-gradient(900px circle at 105% 110%, rgba(91, 157, 255, 0.10), transparent 55%),
+    radial-gradient(700px circle at 50% 50%, rgba(30, 58, 138, 0.06), transparent 60%);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+::selection {
+  background: rgba(91, 157, 255, 0.35);
+  color: #ffffff;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(91, 157, 255, 0.25);
+}
+
+@layer components {
+  .glass {
+    background: linear-gradient(180deg, rgba(25, 25, 35, 0.72) 0%, rgba(20, 20, 30, 0.55) 100%);
+    border: 1px solid var(--border-soft);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+  .glass-strong {
+    background: linear-gradient(180deg, rgba(28, 28, 40, 0.85) 0%, rgba(20, 20, 30, 0.7) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+  .ring-focus {
+    @apply outline-none focus-visible:ring-2 focus-visible:ring-brand-400/60 focus-visible:ring-offset-0;
+  }
+  .text-balance {
+    text-wrap: balance;
+  }
+  .grid-bg {
+    background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(91, 157, 255, 0.35); }
+  50% { box-shadow: 0 0 0 14px rgba(91, 157, 255, 0); }
+}
+.pulse-glow {
+  animation: pulse-glow 2.4s ease-out infinite;
+}
+
+@keyframes ticker {
+  from { background-position: 0 0; }
+  to { background-position: 24px 0; }
+}
