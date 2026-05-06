@@ -1,4 +1,4 @@
-import { Heart } from "lucide-react";
+import { Brain } from "lucide-react";
 
 export function Footer() {
   return (
@@ -8,7 +8,7 @@ export function Footer() {
     >
       <div className="flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
         <div className="flex items-center gap-2">
-          <Heart className="w-3.5 h-3.5 text-brand-400" />
+          <Brain className="w-3.5 h-3.5 text-brand-400" />
           <span>
             <strong className="text-ink-primary font-semibold">Sessão LANC</strong> · Liga de Neurocirurgia da Bahia
           </span>
