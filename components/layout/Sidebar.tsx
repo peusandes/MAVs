@@ -26,7 +26,7 @@ export function Sidebar() {
     <aside className="hidden lg:flex w-[260px] shrink-0 sticky top-0 h-screen flex-col px-4 py-5 border-r border-border-soft bg-bg-base/60 backdrop-blur-md">
       <Link
         href="/"
-        className="flex flex-col items-start gap-2 px-1 mb-7 ring-focus rounded-lg"
+        className="flex flex-col items-center gap-5 px-2 pt-2 mb-9 ring-focus rounded-lg"
         aria-label="LANC — Liga Acadêmica de Neurocirurgia da Bahia"
       >
         <Image
@@ -35,9 +35,9 @@ export function Sidebar() {
           width={956}
           height={661}
           priority
-          className="h-auto w-[128px] -ml-1 select-none pointer-events-none"
+          className="h-auto w-[96px] select-none pointer-events-none"
         />
-        <div className="px-1.5 py-1 rounded-md bg-brand-400/10 border border-brand-400/25 text-[10.5px] uppercase tracking-widest text-brand-400 font-semibold">
+        <div className="px-2 py-1 rounded-md bg-brand-400/10 border border-brand-400/25 text-[10px] uppercase tracking-widest text-brand-400 font-semibold">
           Sessão · MAVs Cerebrais
         </div>
       </Link>
