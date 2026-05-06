@@ -131,7 +131,7 @@ export default function DashboardPage() {
               width={956}
               height={661}
               priority
-              className="h-auto w-[180px] sm:w-[230px] -ml-1 mb-4 select-none pointer-events-none"
+              className="h-auto w-[112px] sm:w-[140px] -ml-1 mb-3 select-none pointer-events-none"
             />
 
             <Badge tone="blue" className="mb-3">

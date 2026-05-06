@@ -48,7 +48,7 @@ export function Header({ onMenu }: { onMenu?: () => void }) {
             width={956}
             height={661}
             priority
-            className="h-9 w-auto select-none pointer-events-none"
+            className="h-7 w-auto select-none pointer-events-none"
           />
         </Link>
 

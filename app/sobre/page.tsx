@@ -30,7 +30,7 @@ export default function AboutPage() {
           width={956}
           height={661}
           priority
-          className="h-auto w-[200px] sm:w-[240px] -ml-1 mb-4 select-none pointer-events-none"
+          className="h-auto w-[128px] sm:w-[156px] -ml-1 mb-3 select-none pointer-events-none"
         />
         <Badge tone="blue" className="mb-2">
           <Sparkles className="w-3 h-3" /> Sobre o projeto

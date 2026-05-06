@@ -50,7 +50,7 @@ export function MobileNav({ open, onClose }: { open: boolean; onClose: () => voi
               width={956}
               height={661}
               priority
-              className="h-auto w-[150px] -ml-1 select-none pointer-events-none"
+              className="h-auto w-[112px] -ml-1 select-none pointer-events-none"
             />
             <span className="px-1.5 py-0.5 rounded-md bg-brand-400/10 border border-brand-400/25 text-[10px] uppercase tracking-widest text-brand-400 font-semibold">
               Sessão · MAVs Cerebrais
