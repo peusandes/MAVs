@@ -1,6 +1,6 @@
 "use client";
 
-import { Sparkles, Flame, Mountain } from "lucide-react";
+import { Sparkles, Flame, Mountain, type LucideIcon } from "lucide-react";
 
 type Diff = { total: number; correct: number; pct: number };
 
@@ -12,7 +12,7 @@ export function DifficultyBreakdown({
   const items: Array<{
     key: "facil" | "medio" | "dificil";
     label: string;
-    icon: any;
+    icon: LucideIcon;
     accent: string;
     border: string;
   }> = [

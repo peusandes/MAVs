@@ -36,9 +36,10 @@ import {
   recentAnswers,
   totalStudyMs,
 } from "@/lib/utils/stats";
-import { formatDuration } from "@/lib/utils/format";
 import { modules } from "@/data/modules";
 import { questions, totalQuestions } from "@/data/questions";
+
+type TimeRange = "7d" | "30d" | "all";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 12 },
@@ -55,6 +56,7 @@ export default function DashboardPage() {
   const sessions = useProgress((s) => s.sessions);
   const lastModule = useProgress((s) => s.lastModule);
   const [hydrated, setHydrated] = React.useState(false);
+  const [range, setRange] = React.useState<TimeRange>("all");
 
   React.useEffect(() => setHydrated(true), []);
 
@@ -77,10 +79,12 @@ export default function DashboardPage() {
   );
   const difficultyStats = React.useMemo(() => buildDifficultyStats(answers), [answers]);
   const heatmap = React.useMemo(() => buildHeatmap(sessions), [sessions]);
-  const performanceSeries = React.useMemo(
-    () => buildPerformanceSeries(sessions),
-    [sessions]
-  );
+  const performanceSeries = React.useMemo(() => {
+    const all = buildPerformanceSeries(sessions);
+    if (range === "all") return all;
+    const days = range === "7d" ? 7 : 30;
+    return all.slice(-days);
+  }, [sessions, range]);
   const recents = React.useMemo(() => recentAnswers(answers, 10), [answers]);
 
   const continueModule = React.useMemo(() => {
@@ -205,7 +209,12 @@ export default function DashboardPage() {
                 icon={ListChecks}
                 label="Questões respondidas"
                 value={totalAnswered}
-                trend={answeredSpark.length > 1 ? answeredSpark[answeredSpark.length - 1] - answeredSpark[0] : undefined}
+                trend={
+                  answeredSpark.length > 1
+                    ? answeredSpark[answeredSpark.length - 1]
+                    : undefined
+                }
+                trendUnit=""
                 trendLabel={`de ${totalQuestions}`}
                 spark={answeredSpark.length > 1 ? answeredSpark : undefined}
                 accent="blue"
@@ -253,7 +262,7 @@ export default function DashboardPage() {
               <CardTitle>Desempenho ao longo do tempo</CardTitle>
               <CardDescription>Aproveitamento (%) por sessão de estudo</CardDescription>
             </div>
-            <Tabs defaultValue="all">
+            <Tabs value={range} onValueChange={(v) => setRange(v as TimeRange)}>
               <TabsList>
                 <TabsTrigger value="7d">7 dias</TabsTrigger>
                 <TabsTrigger value="30d">30 dias</TabsTrigger>

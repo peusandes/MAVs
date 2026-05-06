@@ -13,6 +13,7 @@ export function StatCard({
   prefix,
   decimals = 0,
   trend,
+  trendUnit = "%",
   trendLabel,
   spark,
   accent = "blue",
@@ -24,6 +25,7 @@ export function StatCard({
   prefix?: string;
   decimals?: number;
   trend?: number;
+  trendUnit?: string;
   trendLabel?: string;
   spark?: number[];
   accent?: "blue" | "success" | "warning" | "danger";
@@ -53,7 +55,8 @@ export function StatCard({
           >
             {trendUp ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
             {trendUp ? "+" : ""}
-            {trend.toFixed(0)}%
+            {trend.toFixed(0)}
+            {trendUnit}
           </div>
         )}
       </div>

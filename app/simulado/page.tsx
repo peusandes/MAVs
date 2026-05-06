@@ -67,6 +67,7 @@ export default function SimuladoPage() {
   const [now, setNow] = React.useState<number>(Date.now());
   const [results, setResults] = React.useState<Result[]>([]);
   const [startedAt, setStartedAt] = React.useState<number>(0);
+  const partialRef = React.useRef<Result[]>([]);
   const recordSimuladoRun = useProgress((s) => s.recordSimuladoRun);
   const recordAnswer = useProgress((s) => s.recordAnswer);
   const recentRuns = useProgress((s) => s.simuladoRuns);
@@ -79,7 +80,8 @@ export default function SimuladoPage() {
 
   React.useEffect(() => {
     if (state === "running" && now >= endsAt) {
-      finalize(results);
+      // On timeout, use whatever the runner has answered so far.
+      finalize(partialRef.current);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [now, state]);
@@ -88,6 +90,7 @@ export default function SimuladoPage() {
     const p = pickBalanced();
     setPool(p);
     setResults([]);
+    partialRef.current = [];
     setStartedAt(Date.now());
     setEndsAt(Date.now() + SIMULADO_MS);
     setNow(Date.now());
@@ -242,6 +245,9 @@ export default function SimuladoPage() {
           questions={pool}
           showFeedback={false}
           title="Simulado"
+          onAnswer={(a) => {
+            partialRef.current = [...partialRef.current, a];
+          }}
           onFinish={({ answers }) => finalize(answers)}
         />
       </div>

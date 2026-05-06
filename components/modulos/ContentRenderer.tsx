@@ -174,7 +174,7 @@ function Block({ block }: { block: ContentBlock }) {
             block.items.length === 2
               ? "grid-cols-2"
               : block.items.length === 3
-              ? "grid-cols-2 sm:grid-cols-3"
+              ? "grid-cols-3"
               : "grid-cols-2 sm:grid-cols-4"
           )}
         >

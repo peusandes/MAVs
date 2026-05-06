@@ -32,11 +32,13 @@ export function QuestionRunner({
   questions: pool,
   showFeedback = true,
   onFinish,
+  onAnswer,
   title,
 }: {
   questions: Question[];
   showFeedback?: boolean;
   onFinish?: (result: { answers: { id: string; chosen: string; correct: boolean; timeMs: number }[] }) => void;
+  onAnswer?: (a: { id: string; chosen: string; correct: boolean; timeMs: number }) => void;
   title?: string;
 }) {
   const recordAnswer = useProgress((s) => s.recordAnswer);
@@ -95,11 +97,13 @@ export function QuestionRunner({
         at: Date.now(),
       });
     }
-    setResults((r) => [...r, { id: q.id, chosen, correct, timeMs }]);
+    const entry = { id: q.id, chosen, correct, timeMs };
+    setResults((r) => [...r, entry]);
+    onAnswer?.(entry);
     if (!showFeedback) {
       // Simulado mode: no reveal — auto-advance
       if (isLast) {
-        const next = [...results, { id: q.id, chosen, correct, timeMs }];
+        const next = [...results, entry];
         onFinish?.({ answers: next });
       } else {
         setIndex((i) => i + 1);
