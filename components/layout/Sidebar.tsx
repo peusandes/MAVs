@@ -84,7 +84,7 @@ export function Sidebar() {
           <ChevronDown className={cn("w-3.5 h-3.5 transition-transform", !modulesOpen && "-rotate-90")} />
         </button>
         {modulesOpen && (
-          <div className="flex flex-col gap-0.5 max-h-[42vh] overflow-y-auto pr-1">
+          <div className="flex flex-col gap-1.5 max-h-[44vh] overflow-y-auto pr-1 -mr-1 mt-1">
             {modules.map((m, i) => {
               const isDone = completed.includes(m.slug);
               const active = pathname === `/modulos/${m.slug}`;
@@ -93,7 +93,7 @@ export function Sidebar() {
                   key={m.slug}
                   href={`/modulos/${m.slug}`}
                   className={cn(
-                    "flex items-center gap-2.5 px-3 h-8 rounded-lg text-[12.5px] transition-colors",
+                    "flex items-center gap-3 px-2.5 h-11 rounded-lg text-[13px] leading-tight transition-colors",
                     active
                       ? "bg-brand-400/10 text-brand-400"
                       : "text-ink-secondary hover:text-ink-primary hover:bg-white/3"
@@ -101,8 +101,10 @@ export function Sidebar() {
                 >
                   <span
                     className={cn(
-                      "w-5 h-5 rounded-md text-[10px] font-mono flex items-center justify-center border",
-                      isDone
+                      "w-7 h-7 shrink-0 rounded-md text-[10.5px] font-mono flex items-center justify-center border tabular-nums",
+                      active
+                        ? "bg-brand-400/20 border-brand-400/45 text-brand-400"
+                        : isDone
                         ? "bg-success/15 border-success/30 text-success"
                         : "bg-white/5 border-border-soft text-ink-muted"
                     )}

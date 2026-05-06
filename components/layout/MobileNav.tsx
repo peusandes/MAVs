@@ -104,7 +104,7 @@ export function MobileNav({ open, onClose }: { open: boolean; onClose: () => voi
             <ChevronDown className={cn("w-3.5 h-3.5 transition-transform", !showModules && "-rotate-90")} />
           </button>
           {showModules && (
-            <div className="flex-1 overflow-y-auto pr-1 -mr-1 mt-1">
+            <div className="flex-1 overflow-y-auto pr-1 -mr-1 mt-2 flex flex-col gap-1.5">
               {modules.map((m, i) => {
                 const isDone = completed.includes(m.slug);
                 const active = pathname === `/modulos/${m.slug}`;
@@ -114,7 +114,7 @@ export function MobileNav({ open, onClose }: { open: boolean; onClose: () => voi
                     href={`/modulos/${m.slug}`}
                     onClick={onClose}
                     className={cn(
-                      "flex items-center gap-2.5 px-3 min-h-[40px] rounded-lg text-[12.5px] transition-colors",
+                      "flex items-center gap-3 px-2.5 min-h-[44px] rounded-lg text-[13px] leading-tight transition-colors",
                       active
                         ? "bg-brand-400/10 text-brand-400"
                         : "text-ink-secondary hover:text-ink-primary hover:bg-white/3"
@@ -122,8 +122,10 @@ export function MobileNav({ open, onClose }: { open: boolean; onClose: () => voi
                   >
                     <span
                       className={cn(
-                        "w-6 h-6 rounded-md text-[10px] font-mono flex items-center justify-center border shrink-0",
-                        isDone
+                        "w-7 h-7 rounded-md text-[10.5px] font-mono flex items-center justify-center border shrink-0 tabular-nums",
+                        active
+                          ? "bg-brand-400/20 border-brand-400/45 text-brand-400"
+                          : isDone
                           ? "bg-success/15 border-success/30 text-success"
                           : "bg-white/5 border-border-soft text-ink-muted"
                       )}
