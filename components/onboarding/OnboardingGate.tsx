@@ -3,7 +3,7 @@
 import * as React from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Lock, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 import { useProfile } from "@/lib/store/profile";
@@ -207,17 +207,13 @@ export function OnboardingGate() {
                   </button>
                 </motion.form>
 
-                {/* Privacy + skip */}
+                {/* Skip */}
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.5, delay: 0.5 }}
-                  className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-[12px] text-ink-muted"
+                  className="mt-6 flex justify-end text-[12px] text-ink-muted"
                 >
-                  <div className="inline-flex items-center gap-1.5">
-                    <Lock className="w-3 h-3 text-brand-400" />
-                    Salvo localmente neste dispositivo.
-                  </div>
                   <button
                     type="button"
                     onClick={onSkip}
