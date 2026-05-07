@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono, Fraunces } from "next/font/google";
 import { Toaster } from "sonner";
 import { Shell } from "@/components/layout/Shell";
 import "./globals.css";
@@ -14,6 +14,12 @@ const mono = JetBrains_Mono({
   variable: "--font-mono",
   display: "swap",
 });
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-display",
+  display: "swap",
+  axes: ["opsz", "SOFT"],
+});
 
 export const metadata: Metadata = {
   title: "MAVs Cerebrais — Sessão LANC",
@@ -23,7 +29,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={`${inter.variable} ${mono.variable}`}>
+    <html lang="pt-BR" className={`${inter.variable} ${mono.variable} ${fraunces.variable}`}>
       <body className="font-sans antialiased">
         <Shell>{children}</Shell>
         <Toaster

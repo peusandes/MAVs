@@ -28,6 +28,7 @@ import { Badge } from "@/components/ui/badge";
 import { CircularProgress } from "@/components/ui/progress";
 
 import { useProgress } from "@/lib/store/progress";
+import { useProfile } from "@/lib/store/profile";
 import {
   buildDifficultyStats,
   buildHeatmap,
@@ -55,6 +56,7 @@ export default function DashboardPage() {
   const completed = useProgress((s) => s.completedModules);
   const sessions = useProgress((s) => s.sessions);
   const lastModule = useProgress((s) => s.lastModule);
+  const profile = useProfile((s) => s.profile);
   const [hydrated, setHydrated] = React.useState(false);
   const [range, setRange] = React.useState<TimeRange>("all");
 
@@ -144,10 +146,25 @@ export default function DashboardPage() {
             </Badge>
 
             <h1 className="text-[30px] sm:text-[42px] font-semibold tracking-tight leading-[1.05] text-balance">
-              MAVs Cerebrais
-              <span className="block text-ink-secondary font-medium text-[18px] sm:text-[24px] mt-1">
-                Material didático · {modules.length} módulos · {totalQuestions} questões
-              </span>
+              {hydrated && profile?.name ? (
+                <>
+                  Olá,{" "}
+                  <span className="font-display italic font-light text-brand-400">
+                    {profile.name.split(" ")[0]}
+                  </span>
+                  .
+                  <span className="block text-ink-secondary font-medium text-[18px] sm:text-[24px] mt-1">
+                    MAVs Cerebrais · {modules.length} módulos · {totalQuestions} questões
+                  </span>
+                </>
+              ) : (
+                <>
+                  MAVs Cerebrais
+                  <span className="block text-ink-secondary font-medium text-[18px] sm:text-[24px] mt-1">
+                    Material didático · {modules.length} módulos · {totalQuestions} questões
+                  </span>
+                </>
+              )}
             </h1>
 
             <p className="text-[13.5px] sm:text-[14px] text-ink-secondary mt-3 max-w-[640px]">

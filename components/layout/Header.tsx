@@ -1,13 +1,16 @@
 "use client";
 
 import * as React from "react";
-import { Search, Bell, Settings, Menu } from "lucide-react";
+import { Search, Bell, Settings, Menu, LogOut } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { primaryNav } from "@/data/navigation";
 import { modules } from "@/data/modules";
 import { cn } from "@/lib/utils/cn";
+import { useProfile } from "@/lib/store/profile";
+import { clearProfile } from "@/lib/api/profile";
+import { toast } from "sonner";
 
 function pathLabel(pathname: string): string {
   if (pathname === "/") return "Dashboard";
@@ -20,8 +23,40 @@ function pathLabel(pathname: string): string {
   return item?.label ?? "MAVs LANC";
 }
 
+function getInitials(name?: string): string {
+  if (!name) return "PS";
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+function getFirstName(name?: string): string {
+  if (!name) return "Visitante";
+  return name.trim().split(/\s+/)[0];
+}
+
 export function Header({ onMenu }: { onMenu?: () => void }) {
   const pathname = usePathname();
+  const profile = useProfile((s) => s.profile);
+  const [hydrated, setHydrated] = React.useState(false);
+  const [menuOpen, setMenuOpen] = React.useState(false);
+  const menuRef = React.useRef<HTMLDivElement | null>(null);
+
+  React.useEffect(() => setHydrated(true), []);
+
+  React.useEffect(() => {
+    if (!menuOpen) return;
+    const onClick = (e: MouseEvent) => {
+      if (!menuRef.current) return;
+      if (!menuRef.current.contains(e.target as Node)) setMenuOpen(false);
+    };
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, [menuOpen]);
+
+  const initials = hydrated ? getInitials(profile?.name) : "PS";
+  const firstName = hydrated ? getFirstName(profile?.name) : "Visitante";
+
   return (
     <header
       className="sticky top-0 z-30 backdrop-blur-md bg-bg-base/75 border-b border-border-soft"
@@ -86,14 +121,66 @@ export function Header({ onMenu }: { onMenu?: () => void }) {
           >
             <Settings className="w-4 h-4" />
           </Link>
-          <div className="sm:ml-2 inline-flex items-center gap-2.5 sm:pl-2 sm:pr-3 h-10 rounded-xl sm:border sm:border-border-soft sm:bg-white/3">
-            <div className="w-9 h-9 sm:w-7 sm:h-7 rounded-lg bg-brand-gradient text-white flex items-center justify-center text-[11.5px] font-semibold shadow-glow">
-              PS
-            </div>
-            <div className="hidden sm:block leading-tight">
-              <div className="text-[12.5px] font-medium text-ink-primary">Pedro &amp; Guilherme</div>
-              <div className="text-[10px] text-ink-secondary">LANC · 2026</div>
-            </div>
+          <div className="relative sm:ml-2" ref={menuRef}>
+            <button
+              type="button"
+              onClick={() => setMenuOpen((v) => !v)}
+              aria-label="Abrir menu da conta"
+              aria-expanded={menuOpen}
+              className="inline-flex items-center gap-2.5 sm:pl-2 sm:pr-3 h-10 rounded-xl sm:border sm:border-border-soft sm:bg-white/3 hover:sm:bg-white/8 transition-colors ring-focus"
+            >
+              <div className="w-9 h-9 sm:w-7 sm:h-7 rounded-lg bg-brand-gradient text-white flex items-center justify-center text-[11.5px] font-semibold shadow-glow">
+                {initials}
+              </div>
+              <div className="hidden sm:block leading-tight text-left">
+                <div className="text-[12.5px] font-medium text-ink-primary truncate max-w-[140px]">
+                  {firstName}
+                </div>
+                <div className="text-[10px] text-ink-secondary">
+                  {profile ? "LANC · 2026" : "Visitante"}
+                </div>
+              </div>
+            </button>
+
+            {menuOpen && (
+              <div className="absolute right-0 top-full mt-2 w-64 rounded-xl glass-strong border border-border-soft shadow-2xl py-2 z-40 animate-fade-in-up">
+                <div className="px-3 py-2 border-b border-border-soft">
+                  <div className="text-[10px] uppercase tracking-widest text-ink-muted">
+                    {profile ? "Conectado como" : "Sessão"}
+                  </div>
+                  <div className="text-[13px] font-medium text-ink-primary truncate mt-0.5">
+                    {profile?.name ?? "Visitante anônimo"}
+                  </div>
+                  {profile?.email && (
+                    <div className="text-[11px] text-ink-secondary truncate">
+                      {profile.email}
+                    </div>
+                  )}
+                </div>
+                <Link
+                  href="/sobre"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-2 px-3 py-2 text-[13px] text-ink-secondary hover:text-ink-primary hover:bg-white/5 transition-colors"
+                >
+                  <Settings className="w-3.5 h-3.5" />
+                  Sobre o projeto
+                </Link>
+                {profile && (
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      await clearProfile();
+                      setMenuOpen(false);
+                      toast.message("Sessão encerrada.");
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-[13px] text-ink-secondary hover:text-danger hover:bg-danger/8 transition-colors"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    Sair / trocar nome
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
