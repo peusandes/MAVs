@@ -104,9 +104,6 @@ export function Header({ onMenu }: { onMenu?: () => void }) {
             placeholder="Buscar conteúdo…"
             className="flex-1 bg-transparent outline-none text-sm placeholder:text-ink-muted"
           />
-          <kbd className="text-[10px] font-mono text-ink-muted border border-border-soft px-1.5 rounded">
-            ⌘K
-          </kbd>
         </div>
 
         <div className="flex items-center gap-1 ml-auto md:ml-0">
