@@ -21,22 +21,24 @@ export const supabase: SupabaseClient | null = isSupabaseConfigured
   : null;
 
 /**
- * Ensures we have an auth session — creates an anonymous one if needed.
- * Returns null if Supabase is not configured or if anonymous sign-ins are
- * disabled in the project. Callers should treat null as "offline mode" and
- * fall back to local-only behaviour.
+ * Normalises a display name to a stable identifier shared across devices.
+ *
+ *   "Pedro Sandes Pereira" → "pedro-sandes-pereira"
+ *   "  ANA   da Silva " → "ana-da-silva"
+ *   "João Côrrea" → "joao-correa"
+ *
+ * Two students with the same name will land on the same slug — accepted
+ * trade-off for a Liga-scale, no-password app.
  */
-export async function ensureAuth() {
-  if (!supabase) return null;
-  const { data: existing } = await supabase.auth.getSession();
-  if (existing.session) return existing.session;
-  const { data, error } = await supabase.auth.signInAnonymously();
-  if (error) {
-    console.warn(
-      "[supabase] anonymous sign-in failed — running in local-only mode:",
-      error.message
-    );
-    return null;
-  }
-  return data.session;
+export function nameSlug(name: string): string {
+  return name
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "") // strip diacritics
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 60);
 }

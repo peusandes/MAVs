@@ -1,14 +1,11 @@
 /**
- * Progress API — sync wrapper around the local Zustand store.
+ * Progress API.
  *
- * Each function:
- *   1. Updates the local store synchronously (optimistic UI).
- *   2. Pushes the change to Supabase (best-effort, fire-and-forget).
- *
- * Failures in the remote write never break the UI — the local store
- * remains the source of truth for the current session. On the next page
- * load, BackgroundSync re-hydrates the store from Supabase, so partial
- * writes are eventually consistent.
+ * All writes are scoped by the local profile slug. If no profile is set,
+ * writes still go to the local Zustand store but are NOT pushed to
+ * Supabase (the server has nowhere to put them — it's keyed on profile id).
+ * The OnboardingGate makes sure a profile exists before the user can do
+ * anything that produces progress.
  */
 
 import {
@@ -16,22 +13,24 @@ import {
   type AnswerRecord,
   type SimuladoRun,
 } from "@/lib/store/progress";
-import { ensureAuth, supabase, isSupabaseConfigured } from "@/lib/supabase/client";
+import { useProfile } from "@/lib/store/profile";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 
-async function authedUserId(): Promise<string | null> {
-  if (!isSupabaseConfigured || !supabase) return null;
-  const session = await ensureAuth();
-  return session?.user.id ?? null;
+function profileId(): string | null {
+  return useProfile.getState().profile?.id ?? null;
+}
+
+function canSync(): boolean {
+  return !!(isSupabaseConfigured && supabase && profileId());
 }
 
 export async function recordAnswer(input: AnswerRecord): Promise<void> {
-  // Local first
   useProgress.getState().recordAnswer(input);
 
-  const userId = await authedUserId();
-  if (!userId || !supabase) return;
+  if (!canSync()) return;
+  const userId = profileId()!;
   try {
-    await supabase.from("answers").upsert(
+    await supabase!.from("answers").upsert(
       {
         user_id: userId,
         question_id: input.questionId,
@@ -53,10 +52,10 @@ export async function toggleFlag(questionId: string): Promise<void> {
   useProgress.getState().toggleFlag(questionId);
   const flagged = !!useProgress.getState().flagged[questionId];
 
-  const userId = await authedUserId();
-  if (!userId || !supabase) return;
+  if (!canSync()) return;
+  const userId = profileId()!;
   try {
-    await supabase
+    await supabase!
       .from("answers")
       .update({ flagged })
       .eq("user_id", userId)
@@ -69,10 +68,10 @@ export async function toggleFlag(questionId: string): Promise<void> {
 export async function markModuleComplete(slug: string): Promise<void> {
   useProgress.getState().markModuleComplete(slug);
 
-  const userId = await authedUserId();
-  if (!userId || !supabase) return;
+  if (!canSync()) return;
+  const userId = profileId()!;
   try {
-    await supabase.from("completed_modules").upsert(
+    await supabase!.from("completed_modules").upsert(
       { user_id: userId, module_slug: slug },
       { onConflict: "user_id,module_slug" }
     );
@@ -84,10 +83,10 @@ export async function markModuleComplete(slug: string): Promise<void> {
 export async function unmarkModuleComplete(slug: string): Promise<void> {
   useProgress.getState().unmarkModuleComplete(slug);
 
-  const userId = await authedUserId();
-  if (!userId || !supabase) return;
+  if (!canSync()) return;
+  const userId = profileId()!;
   try {
-    await supabase
+    await supabase!
       .from("completed_modules")
       .delete()
       .eq("user_id", userId)
@@ -100,10 +99,10 @@ export async function unmarkModuleComplete(slug: string): Promise<void> {
 export async function setLastModule(slug: string): Promise<void> {
   useProgress.getState().setLastModule(slug);
 
-  const userId = await authedUserId();
-  if (!userId || !supabase) return;
+  if (!canSync()) return;
+  const userId = profileId()!;
   try {
-    await supabase.from("last_module").upsert(
+    await supabase!.from("last_module").upsert(
       {
         user_id: userId,
         module_slug: slug,
@@ -119,10 +118,10 @@ export async function setLastModule(slug: string): Promise<void> {
 export async function recordSimuladoRun(run: SimuladoRun): Promise<void> {
   useProgress.getState().recordSimuladoRun(run);
 
-  const userId = await authedUserId();
-  if (!userId || !supabase) return;
+  if (!canSync()) return;
+  const userId = profileId()!;
   try {
-    await supabase.from("simulado_runs").insert({
+    await supabase!.from("simulado_runs").insert({
       user_id: userId,
       score: run.score,
       total: run.total,
@@ -137,12 +136,12 @@ export async function recordSimuladoRun(run: SimuladoRun): Promise<void> {
 
 /**
  * Pulls the user's progress from Supabase and merges it into the local
- * store. Server data wins for keys present remotely; local-only entries
- * (made offline) are preserved.
+ * store. Server data is canonical for keys present remotely; local-only
+ * entries (made offline) are preserved.
  */
 export async function hydrateProgress(): Promise<void> {
-  const userId = await authedUserId();
-  if (!userId || !supabase) return;
+  if (!canSync()) return;
+  const userId = profileId()!;
 
   try {
     const [
@@ -151,14 +150,17 @@ export async function hydrateProgress(): Promise<void> {
       { data: lastModule },
       { data: simulados },
     ] = await Promise.all([
-      supabase.from("answers").select("*").eq("user_id", userId),
-      supabase.from("completed_modules").select("module_slug").eq("user_id", userId),
-      supabase
+      supabase!.from("answers").select("*").eq("user_id", userId),
+      supabase!
+        .from("completed_modules")
+        .select("module_slug")
+        .eq("user_id", userId),
+      supabase!
         .from("last_module")
         .select("module_slug")
         .eq("user_id", userId)
         .maybeSingle(),
-      supabase
+      supabase!
         .from("simulado_runs")
         .select("*")
         .eq("user_id", userId)
@@ -166,7 +168,6 @@ export async function hydrateProgress(): Promise<void> {
         .limit(50),
     ]);
 
-    // Build remote answer map
     const remoteAnswers: Record<string, AnswerRecord> = {};
     const remoteFlags: Record<string, true> = {};
     (answers ?? []).forEach((a: any) => {
@@ -184,8 +185,6 @@ export async function hydrateProgress(): Promise<void> {
 
     const state = useProgress.getState();
     const mergedAnswers = { ...state.answers, ...remoteAnswers };
-    // Server answers take precedence (canonical) but keep any local entries
-    // that haven't synced yet.
     Object.entries(state.answers).forEach(([id, local]) => {
       const remote = remoteAnswers[id];
       if (!remote || local.at > remote.at) mergedAnswers[id] = local;

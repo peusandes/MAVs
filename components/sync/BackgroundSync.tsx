@@ -1,34 +1,36 @@
 "use client";
 
 import * as React from "react";
-import { ensureAuth, isSupabaseConfigured } from "@/lib/supabase/client";
+import { isSupabaseConfigured } from "@/lib/supabase/client";
+import { useProfile } from "@/lib/store/profile";
 import { getProfile } from "@/lib/api/profile";
 import { hydrateProgress } from "@/lib/api/progress";
 
 /**
- * On mount:
- *   1. Ensures an anonymous Supabase session exists.
- *   2. Pulls the user's profile and progress and merges into the local store.
+ * On mount and on profile changes:
+ *   - If a profile exists locally, refresh it from the server and pull the
+ *     full progress history attached to that name slug.
  *
- * Renders nothing. Everything runs once, side-effect only.
+ * Renders nothing.
  */
 export function BackgroundSync() {
+  const profileId = useProfile((s) => s.profile?.id);
+
   React.useEffect(() => {
-    if (!isSupabaseConfigured) return;
+    if (!isSupabaseConfigured || !profileId) return;
     let cancelled = false;
     (async () => {
       try {
-        const session = await ensureAuth();
-        if (!session || cancelled) return;
         await Promise.all([getProfile(), hydrateProgress()]);
-      } catch (err) {
-        // Logged at the lower layers; nothing to recover here.
+        if (cancelled) return;
+      } catch {
+        // Errors are logged at the lower layers.
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [profileId]);
 
   return null;
 }

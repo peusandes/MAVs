@@ -1,21 +1,22 @@
 /**
  * Profile API.
  *
- * - Source of truth: Supabase `public.profiles` (keyed by anon auth UUID).
- * - Local Zustand store mirrors the profile for instant UI / offline fallback.
+ * Identity model: a normalised name slug. Two students who type the same
+ * name (case / accent insensitive) share a profile and a dataset across
+ * any browser or device. There's no auth, no PIN, no email — just a name.
  *
- * If Supabase is not configured or anonymous sign-ins are disabled, every
- * call gracefully degrades to the local store — the app keeps working.
+ * If Supabase isn't reachable, every call falls through to the local
+ * Zustand store so the app keeps working offline.
  */
 
 import { useProfile, type Profile } from "@/lib/store/profile";
-import { ensureAuth, supabase, isSupabaseConfigured } from "@/lib/supabase/client";
+import { supabase, isSupabaseConfigured, nameSlug } from "@/lib/supabase/client";
 
 export type { Profile };
 
 type Row = {
   id: string;
-  name: string;
+  display_name: string;
   email: string | null;
   created_at: string;
   updated_at: string;
@@ -24,7 +25,7 @@ type Row = {
 function fromRow(row: Row): Profile {
   return {
     id: row.id,
-    name: row.name,
+    name: row.display_name,
     email: row.email ?? undefined,
     onboardedAt: new Date(row.created_at).getTime(),
   };
@@ -32,22 +33,20 @@ function fromRow(row: Row): Profile {
 
 export async function getProfile(): Promise<Profile | null> {
   const cached = useProfile.getState().profile;
-  if (!isSupabaseConfigured || !supabase) return cached;
+  if (!cached || !isSupabaseConfigured || !supabase) return cached;
+
+  // Refresh display_name / email from the server (might have been edited
+  // on another device).
   try {
-    const session = await ensureAuth();
-    if (!session) return cached;
     const { data, error } = await supabase
       .from("profiles")
       .select("*")
-      .eq("id", session.user.id)
+      .eq("id", cached.id)
       .maybeSingle();
-    if (error) return cached;
-    if (data) {
-      const profile = fromRow(data as Row);
-      useProfile.setState({ profile });
-      return profile;
-    }
-    return cached;
+    if (error || !data) return cached;
+    const profile = fromRow(data as Row);
+    useProfile.setState({ profile });
+    return profile;
   } catch {
     return cached;
   }
@@ -57,24 +56,30 @@ export async function saveProfile(input: {
   name: string;
   email?: string;
 }): Promise<Profile> {
-  const trimmed = input.name.trim();
-  if (!trimmed) throw new Error("Nome obrigatório");
+  const display = input.name.trim();
+  if (!display) throw new Error("Nome obrigatório");
+  const slug = nameSlug(display);
+  if (!slug) throw new Error("Nome inválido");
 
-  // Optimistic local write so the UI updates instantly (also covers offline).
-  const local = useProfile.getState().setProfile(input);
+  const local: Profile = {
+    id: slug,
+    name: display,
+    email: input.email?.trim() || undefined,
+    onboardedAt: Date.now(),
+  };
+
+  // Optimistic local write (also covers offline mode).
+  useProfile.setState({ profile: local, skipped: false });
 
   if (!isSupabaseConfigured || !supabase) return local;
 
   try {
-    const session = await ensureAuth();
-    if (!session) return local;
-
     const { data, error } = await supabase
       .from("profiles")
       .upsert(
         {
-          id: session.user.id,
-          name: trimmed,
+          id: slug,
+          display_name: display,
           email: input.email?.trim() || null,
         },
         { onConflict: "id" }
@@ -87,7 +92,6 @@ export async function saveProfile(input: {
       return local;
     }
     const profile = fromRow(data as Row);
-    // Reconcile local store with server canonical row (id from auth).
     useProfile.setState({ profile, skipped: false });
     return profile;
   } catch (err: any) {
@@ -101,8 +105,8 @@ export async function skipOnboarding(): Promise<void> {
 }
 
 export async function clearProfile(): Promise<void> {
-  // Local-only: keeps the anonymous auth session so the user retains the same
-  // UUID and progress server-side. The OnboardingGate re-opens to allow them
-  // to enter a new name (which UPSERTs the profile row).
+  // Local-only: clears the cached identity so the OnboardingGate re-opens.
+  // The remote profile and its data remain — re-entering the same name
+  // recovers them on any device.
   useProfile.getState().clear();
 }

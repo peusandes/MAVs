@@ -8,6 +8,7 @@ import { toast } from "sonner";
 
 import { useProfile } from "@/lib/store/profile";
 import { saveProfile, skipOnboarding } from "@/lib/api/profile";
+import { hydrateProgress } from "@/lib/api/progress";
 
 export function OnboardingGate() {
   const profile = useProfile((s) => s.profile);
@@ -40,6 +41,8 @@ export function OnboardingGate() {
     setSubmitting(true);
     try {
       const profile = await saveProfile({ name: trimmed });
+      // Pull any existing progress already attached to this name across devices.
+      await hydrateProgress();
       const first = profile.name.split(" ")[0];
       toast.success(`Bem-vindo(a), ${first}.`);
     } catch (err) {
