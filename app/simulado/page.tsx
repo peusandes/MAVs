@@ -17,6 +17,10 @@ import {
 import { questions } from "@/data/questions";
 import { modules } from "@/data/modules";
 import { useProgress } from "@/lib/store/progress";
+import {
+  recordAnswer as apiRecordAnswer,
+  recordSimuladoRun as apiRecordSimulado,
+} from "@/lib/api/progress";
 
 import { QuestionRunner } from "@/components/questoes/QuestionRunner";
 import { Button } from "@/components/ui/button";
@@ -68,8 +72,6 @@ export default function SimuladoPage() {
   const [results, setResults] = React.useState<Result[]>([]);
   const [startedAt, setStartedAt] = React.useState<number>(0);
   const partialRef = React.useRef<Result[]>([]);
-  const recordSimuladoRun = useProgress((s) => s.recordSimuladoRun);
-  const recordAnswer = useProgress((s) => s.recordAnswer);
   const recentRuns = useProgress((s) => s.simuladoRuns);
 
   React.useEffect(() => {
@@ -109,7 +111,7 @@ export default function SimuladoPage() {
       if (r.correct) slot.correct += 1;
 
       // also record into general progress
-      recordAnswer({
+      void apiRecordAnswer({
         questionId: q.id,
         module: q.module,
         difficulty: q.difficulty,
@@ -127,7 +129,7 @@ export default function SimuladoPage() {
       durationMs: Date.now() - startedAt,
       perModule,
     };
-    recordSimuladoRun(run);
+    void apiRecordSimulado(run);
     setResults(rs);
     setState("results");
 

@@ -12,11 +12,29 @@ Pré-requisitos: **Node.js 18.17+** (recomendado 20+).
 
 ```bash
 cd "/Users/pedrosandes/Documents/Claude trend/Claude MAV"
+cp .env.example .env.local       # depois edite com sua URL e anon key
 npm install
 npm run dev
 ```
 
 Abra http://localhost:3000.
+
+## Backend (Supabase)
+
+O app funciona offline (sem Supabase) usando localStorage. Quando configurado, sincroniza perfil + progresso na nuvem para que o usuário recupere os dados em outro dispositivo.
+
+**Para conectar a um projeto Supabase:**
+
+1. Em `.env.local`, defina:
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=https://seu-ref.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_...   (ou JWT anon)
+   ```
+2. No dashboard Supabase do projeto, em **Authentication → Sign In / Up**, habilite **Anonymous Sign-Ins**.
+3. No **SQL Editor**, cole e execute o conteúdo de [`supabase/migration.sql`](supabase/migration.sql) — cria as tabelas `profiles`, `answers`, `completed_modules`, `simulado_runs`, `last_module` com RLS por usuário.
+4. Reinicie `npm run dev`.
+
+A UI continua idêntica; o que muda é que agora `OnboardingGate` cria uma sessão anônima com UUID estável e faz upsert do nome em `profiles`. `BackgroundSync` no `Shell` hidrata as respostas/módulos concluídos do servidor a cada visita.
 
 ## Funcionalidades
 

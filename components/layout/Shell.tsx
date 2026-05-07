@@ -6,6 +6,7 @@ import { Header } from "./Header";
 import { Footer } from "./Footer";
 import { MobileNav } from "./MobileNav";
 import { OnboardingGate } from "@/components/onboarding/OnboardingGate";
+import { BackgroundSync } from "@/components/sync/BackgroundSync";
 
 export function Shell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(false);
@@ -24,6 +25,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <Footer />
       </div>
       <OnboardingGate />
+      <BackgroundSync />
     </div>
   );
 }

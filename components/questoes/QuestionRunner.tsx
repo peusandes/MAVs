@@ -15,6 +15,7 @@ import {
 
 import type { Question } from "@/data/questions";
 import { useProgress } from "@/lib/store/progress";
+import { recordAnswer, toggleFlag as apiToggleFlag } from "@/lib/api/progress";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -41,9 +42,8 @@ export function QuestionRunner({
   onAnswer?: (a: { id: string; chosen: string; correct: boolean; timeMs: number }) => void;
   title?: string;
 }) {
-  const recordAnswer = useProgress((s) => s.recordAnswer);
   const flagged = useProgress((s) => s.flagged);
-  const toggleFlag = useProgress((s) => s.toggleFlag);
+  const toggleFlag = (id: string) => void apiToggleFlag(id);
 
   const [index, setIndex] = React.useState(0);
   const [chosen, setChosen] = React.useState<string | null>(null);
@@ -87,7 +87,7 @@ export function QuestionRunner({
     const correct = chosen === q.correctAnswerId;
     setRevealed(true);
     if (showFeedback) {
-      recordAnswer({
+      void recordAnswer({
         questionId: q.id,
         module: q.module,
         difficulty: q.difficulty,

@@ -16,6 +16,11 @@ import {
 import { modules } from "@/data/modules";
 import { questions } from "@/data/questions";
 import { useProgress } from "@/lib/store/progress";
+import {
+  markModuleComplete as apiMark,
+  unmarkModuleComplete as apiUnmark,
+  setLastModule as apiSetLast,
+} from "@/lib/api/progress";
 import { ContentRenderer } from "@/components/modulos/ContentRenderer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -31,13 +36,10 @@ export default function ModuleDetailPage() {
   const next = idx >= 0 && idx < modules.length - 1 ? modules[idx + 1] : null;
 
   const completed = useProgress((s) => s.completedModules);
-  const markComplete = useProgress((s) => s.markModuleComplete);
-  const unmark = useProgress((s) => s.unmarkModuleComplete);
-  const setLast = useProgress((s) => s.setLastModule);
 
   React.useEffect(() => {
-    if (m) setLast(m.slug);
-  }, [m, setLast]);
+    if (m) void apiSetLast(m.slug);
+  }, [m]);
 
   if (!m) {
     notFound();
@@ -102,10 +104,10 @@ export default function ModuleDetailPage() {
               className="w-full"
               onClick={() => {
                 if (isDone) {
-                  unmark(m.slug);
+                  void apiUnmark(m.slug);
                   toast.message("Marcação removida.");
                 } else {
-                  markComplete(m.slug);
+                  void apiMark(m.slug);
                   toast.success("Módulo concluído!");
                 }
               }}
