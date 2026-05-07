@@ -60,34 +60,33 @@ export function OnboardingGate() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.4 }}
-          className="fixed inset-0 z-[200] overflow-y-auto"
+          className="fixed inset-0 z-[200] bg-[#08080d]"
           aria-modal="true"
           role="dialog"
           aria-labelledby="onboarding-title"
         >
-          {/* Canvas */}
-          <div className="absolute inset-0 bg-[#08080d]">
-            {/* Layered atmospheric background */}
-            <div
-              aria-hidden
-              className="absolute inset-0"
-              style={{
-                background:
-                  "radial-gradient(720px circle at 18% 12%, rgba(91,157,255,0.32), transparent 60%), radial-gradient(900px circle at 82% 88%, rgba(30,58,138,0.34), transparent 55%), radial-gradient(420px circle at 50% 60%, rgba(91,157,255,0.08), transparent 70%)",
-              }}
-            />
-            <div
-              aria-hidden
-              className="absolute inset-0 opacity-[0.06] mix-blend-overlay"
-              style={{
-                backgroundImage:
-                  "radial-gradient(rgba(255,255,255,0.6) 1px, transparent 1px)",
-                backgroundSize: "3px 3px",
-              }}
-            />
-          </div>
+          {/* Layered atmospheric background — pinned to the viewport, never scrolls */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(720px circle at 18% 12%, rgba(91,157,255,0.32), transparent 60%), radial-gradient(900px circle at 82% 88%, rgba(30,58,138,0.34), transparent 55%), radial-gradient(420px circle at 50% 60%, rgba(91,157,255,0.08), transparent 70%)",
+            }}
+          />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 opacity-[0.06] mix-blend-overlay"
+            style={{
+              backgroundImage:
+                "radial-gradient(rgba(255,255,255,0.6) 1px, transparent 1px)",
+              backgroundSize: "3px 3px",
+            }}
+          />
 
-          <div className="relative min-h-full flex items-center justify-center px-5 py-10 sm:py-16">
+          {/* Scroll container — sibling of the bg layers so its scrolling never reveals what's behind */}
+          <div className="absolute inset-0 overflow-y-auto overscroll-contain">
+            <div className="relative min-h-full flex items-center justify-center px-5 py-10 sm:py-16">
             <motion.section
               initial={{ y: 28, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -239,6 +238,7 @@ export function OnboardingGate() {
                 Pedro Sandes Pereira · Guilherme Nery · Orientação Dr. Alexandre Drayton
               </motion.div>
             </motion.section>
+            </div>
           </div>
         </motion.div>
       )}
